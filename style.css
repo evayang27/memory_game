@@ -79,6 +79,12 @@
   transform: rotate(180deg);
 }
 
+/* 紅心 菱形 */
+
+.red {
+  color: #f14335;
+}
+
 /* card 背面 */
 
 .back {
