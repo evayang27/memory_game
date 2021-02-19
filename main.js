@@ -95,6 +95,28 @@ const view = {
   // (6). 次數變化
   renderTriedTimes(times) {
     document.querySelector('.triedTimes span').textContent = `${times}`
+  },
+  // (7). 配對失敗動畫
+  appendWrongAnimation(...cards) {
+    cards.map(card => {
+      card.classList.add('wrong')
+      // 動畫跑完卸載監聽器
+      card.addEventListener('animationend', event => {
+        event.target.classList.remove('wrong'), { once: true }
+      })
+    })
+  },
+  // (8). game finished
+  showGameFinished() {
+    const finished = document.createElement('div')
+    finished.classList.add('finished')
+    finished.innerHTML = `
+    <h2 class="completed">Well Done!</h2>
+    <p>Score : ${model.score}</p>
+    <p>You've tried ${model.triedTimes} times</p>
+    `
+    const header = document.querySelector('#header')
+    header.before(finished)
   }
 }
 
@@ -149,10 +171,18 @@ const controller = {
           view.pairCards(...model.revealCards)
           view.renderScore(model.score += 10)
           model.clearRevealCards()
+          // 判斷是否全配對成功
+          if (model.score === 260) {
+            this.currentState = GAME_STATE.GameFinished
+            view.showGameFinished()
+            return
+          }
           this.currentState = GAME_STATE.FirstCardAwaits
         } else {
           // 失敗 翻回背面 更改state
           this.currentState = GAME_STATE.CardMatchFailed
+          // 失敗動畫
+          view.appendWrongAnimation(...model.revealCards)
           // 沒有setTimeout 會直接翻回背面 看不出有翻過 最後state回FirstCardAwaits
           // 不能加(), 因為是呼叫整個函式內容 不是結果
           setTimeout(this.resetCards, 1000)

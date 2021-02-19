@@ -8,7 +8,7 @@
   flex-direction: column; */
   /* align-items: flex-end; */
   width: 90%;
-  margin: 50px auto 10px;
+  margin: 30px auto 10px;
 }
 
 /* text vertical align center line-height跟box height一樣 */
@@ -60,7 +60,7 @@
 
 #cards {
   width: 90%;
-  margin: 0 auto 50px;
+  margin: 0 auto 20px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -114,4 +114,42 @@
 
 .paired {
   border: 2px solid #ffad2b;
+}
+
+/* 配對失敗 */
+
+.wrong {
+  animation-name: wrong;
+  animation-duration: 0.25s;
+  animation-iteration-count: 4;
+}
+
+@keyframes wrong {
+  to {
+    border: 2px solid #a333e4;
+  }
+}
+
+/* game finished */
+
+.finished {
+  position: absolute;
+  z-index: 99;
+  width: 100%;
+  text-align: center;
+  top: 50%;
+  transform: translate(0, -50%);
+  background: radial-gradient(circle, rgba(255, 208, 120, 1) 23%, rgba(140, 196, 5, 1) 100%);
+  padding: 40px 0;
+}
+
+.finished h2 {
+  font-size: 30px;
+  margin-bottom: 10px;
+  color: #680049;
+}
+
+.finished p {
+  font-size: 20px;
+  color: #415f5c;
 }
