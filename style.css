@@ -35,14 +35,32 @@
 }
 
 .score {
-  margin-right: 40px;
+  width: 15vw;
+  margin-left: 10px;
+}
+
+.score span {
+  font-weight: 700;
+  color: #ff4e58;
+}
+
+.triedTimes {
+  width: 20vw;
+}
+
+.triedTimes span {
+  font-weight: 700;
+  color: #ff7700;
+  width: 25px;
+  display: inline-block;
+  text-align: center;
 }
 
 /* card panel */
 
 #cards {
   width: 90%;
-  margin: 0 auto;
+  margin: 0 auto 50px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;

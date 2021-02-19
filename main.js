@@ -82,12 +82,19 @@ const view = {
       card.innerHTML = null
     })
   },
-
   // (4). 配對成功加效果
   pairCards(...cards) {
     cards.map(card => {
       card.classList.add('paired')
     })
+  },
+  // (5). 分數變化
+  renderScore(score) {
+    document.querySelector('.score span').textContent = `${score}`
+  },
+  // (6). 次數變化
+  renderTriedTimes(times) {
+    document.querySelector('.triedTimes span').textContent = `${times}`
   }
 }
 
@@ -130,14 +137,17 @@ const controller = {
         this.currentState = GAME_STATE.SecondCardAwaits
         break
       case GAME_STATE.SecondCardAwaits:
+        // tried times +1
+        view.renderTriedTimes(++model.triedTimes)
         // 翻開第二張牌 暫存 更改state
         view.flipCards(card)
         model.revealCards.push(card)
         // 判斷配對是否成功
         if (model.isCardsMatched()) {
-          // 成功 更改state 加效果
+          // 成功 更改state 加效果 加分
           this.currentState = GAME_STATE.CardMatched
           view.pairCards(...model.revealCards)
+          view.renderScore(model.score += 10)
           model.clearRevealCards()
           this.currentState = GAME_STATE.FirstCardAwaits
         } else {
@@ -172,7 +182,10 @@ const model = {
   // (3). 清空暫存
   clearRevealCards() {
     this.revealCards = []
-  }
+  },
+  // (4). score/times
+  score: 0,
+  triedTimes: 0
 
 }
 
