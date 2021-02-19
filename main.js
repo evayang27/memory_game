@@ -1,4 +1,4 @@
-// 符號圖檔
+// 0-1. 符號圖檔
 const Symbols = [
   'https://image.flaticon.com/icons/svg/105/105223.svg', // 黑桃
   'https://www.flaticon.com/svg/vstatic/svg/2107/2107845.svg?token=exp=1613744394~hmac=57d0bcbe13b3a4dcf62f88e40a3bf8d3', // 愛心
@@ -6,10 +6,19 @@ const Symbols = [
   'https://image.flaticon.com/icons/svg/105/105219.svg' // 梅花
 ]
 
-// view layer
+// 0-2. 定義狀態
+const GAME_STATE = {
+  FirstCardAwaits: 'FirstCardAwaits',
+  SecondCardAwaits: 'SecondCardAwaits',
+  CardMatchFailed: ' CardMatchFailed',
+  CardMatched: 'CardMatched',
+  GameFinished: 'GameFinished',
+}
+
+// 1. view layer
 const view = {
   // 顯示單張卡片正面 -> 拆成兩部分 innerHTML 內容另設 function
-  // 1-1. 增加卡片DOM(背面)
+  // (1-1). 增加卡片DOM(背面)
   getCardElement(index) {
     return `
       <div class="card-box">
@@ -17,7 +26,7 @@ const view = {
       </div>
     `
   },
-  // 1-2. 取得卡片內容
+  // (1-2). 取得卡片內容
   getCardContent(index) {
     // 卡片數字花色用 0-51 去求 
     const cardNumber = this.transformNumber((index % 13) + 1)
@@ -28,7 +37,7 @@ const view = {
         <p>${cardNumber}</p>
     `
   },
-  // 1-3. A J Q K 數字變換
+  // (1-3). A J Q K 數字變換
   transformNumber(number) {
     switch (number) {
       case 1:
@@ -43,7 +52,7 @@ const view = {
         return number
     }
   },
-  // 1-4. heart diamond cards -> red
+  // (1-4). heart diamond cards -> red
   transformColor() {
     const cardList = document.querySelectorAll('.card')
     cardList.forEach(card => {
@@ -53,15 +62,15 @@ const view = {
       }
     })
   },
-  // 2. 產生52張卡片
-  displayCards() {
+  // (2). 產生52張卡片
+  displayCards(randomIndexes) {
     const cardPanel = document.querySelector('#cards')
     // 產生 0-51 arr -> 呼叫 getCardElement 52次 -> 合成內容放進#cards
     // array先洗牌
-    cardPanel.innerHTML = utility.getRandomNumberArray(52).map(index => this.getCardElement(index)).join('')
+    cardPanel.innerHTML = randomIndexes.map(index => this.getCardElement(index)).join('')
     this.transformColor()
   },
-  // 3. 翻牌
+  // (3). 翻牌
   flipCard(card) {
     console.log('flips')
     if (card.classList.contains('back')) {
@@ -74,7 +83,7 @@ const view = {
   }
 }
 
-// utility 已知工具
+// 2. utility 已知工具
 const utility = {
   // 洗牌 Fisher-Yates Shuffle(Knuth-Shuffle) algor, 最後一項跟前面的換 
   // count 放 arr length 這邊是指一組牌數量52
@@ -91,9 +100,26 @@ const utility = {
   },
 }
 
+// 3. controller layer 控制遊戲狀態 不要讓 controller 以外的內部函式暴露在 global 其他 layer 不要互相接觸ㄔ
+const controller = {
+  // (1). 遊戲狀態
+  currentState: GAME_STATE.FirstCardAwaits,
+  // (2). 產生卡片呼叫controller
+  generateCards() {
+    view.displayCards(utility.getRandomNumberArray(52))
+  }
+
+
+}
+// 4. model layer 管理資料
+const model = {
+  // (1). 翻開的卡片暫存arr 檢查完是否matched 清空
+  revealCards: [],
+
+}
 
 // 初始render
-view.displayCards()
+controller.generateCards()
 
 // event flip card 每張牌都加監聽器 要在初始render後面
 document.querySelectorAll('.card').forEach(card => {
