@@ -72,7 +72,6 @@ const view = {
   },
   // (3). 翻牌
   flipCard(card) {
-    console.log('flips')
     if (card.classList.contains('back')) {
       card.classList.remove('back')
       card.innerHTML = this.getCardContent(Number(card.dataset.index))
@@ -80,6 +79,10 @@ const view = {
     }
     card.classList.add('back')
     card.innerHTML = null
+  },
+  // (4). 配對成功加效果
+  pairCard(card) {
+    card.classList.add('paired')
   }
 }
 
@@ -107,6 +110,45 @@ const controller = {
   // (2). 產生卡片呼叫controller
   generateCards() {
     view.displayCards(utility.getRandomNumberArray(52))
+  },
+  // (3). 根據遊戲state 決定下一步
+  dispatchCardAction(card) {
+    // 如果卡片是正面 那沒事
+    if (!card.classList.contains('back')) {
+      return
+    }
+    switch (this.currentState) {
+      case GAME_STATE.FirstCardAwaits:
+        // 翻開第一張牌 暫存 更改state
+        view.flipCard(card)
+        model.revealCards.push(card)
+        this.currentState = GAME_STATE.SecondCardAwaits
+        break
+      case GAME_STATE.SecondCardAwaits:
+        // 翻開第二張牌 暫存 更改state
+        view.flipCard(card)
+        model.revealCards.push(card)
+        // 判斷配對是否成功
+        if (model.isCardsMatched()) {
+          // 成功 更改state 加效果
+          this.currentState = GAME_STATE.CardMatched
+          view.pairCard(model.revealCards[0])
+          view.pairCard(model.revealCards[1])
+          model.clearRevealCards()
+        } else {
+          // 失敗 翻回背面 更改state
+          this.currentState = GAME_STATE.CardMatchFailed
+          // 沒有setTimeout 會直接翻回背面 看不出有翻過 最後state回FirstCardAwaits
+          setTimeout(() => {
+            view.flipCard(model.revealCards[0])
+            view.flipCard(model.revealCards[1])
+            model.clearRevealCards()
+            this.currentState = GAME_STATE.FirstCardAwaits
+          }, 1000)
+        }
+        break
+    }
+
   }
 
 
@@ -115,6 +157,14 @@ const controller = {
 const model = {
   // (1). 翻開的卡片暫存arr 檢查完是否matched 清空
   revealCards: [],
+  // (2). 判斷配對是否成功
+  isCardsMatched() {
+    return this.revealCards[0].dataset.index % 13 === this.revealCards[1].dataset.index % 13
+  },
+  // (3). 清空暫存
+  clearRevealCards() {
+    this.revealCards = []
+  }
 
 }
 
@@ -124,7 +174,7 @@ controller.generateCards()
 // event flip card 每張牌都加監聽器 要在初始render後面
 document.querySelectorAll('.card').forEach(card => {
   card.addEventListener('click', event => {
-    view.flipCard(card)
+    controller.dispatchCardAction(card)
   })
 })
 

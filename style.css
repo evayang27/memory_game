@@ -58,7 +58,7 @@
 /* card 正面 */
 
 .card {
-  border: solid 1px #ccc;
+  border: solid 2px #ccc;
   padding: 5px 8px;
   width: 100%;
   height: 100%;
@@ -90,4 +90,10 @@
 .back {
   background: url('https://i.pinimg.com/originals/a1/fe/1e/a1fe1efba0b06fb9754b853ff90e0a2d.jpg');
   background-size: contain;
+}
+
+/* 配對成功 */
+
+.paired {
+  border: 2px solid #ffad2b;
 }
